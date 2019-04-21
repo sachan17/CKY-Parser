@@ -121,6 +121,14 @@ def evaluate(words, predicted, actual):
         f1_score = (2*precision*recall)/(precision + recall)
     return precision, recall, f1_score
 
+def get_start(score, l):
+    max_p = 0
+    root = None
+    for each in score[0][l]:
+        if score[0][l][each] > max_p:
+            root = each
+    return Tree(root, [])
+
 def main():
     files = tb.fileids()
     data = list(tb.parsed_sents(files))
@@ -137,18 +145,24 @@ def main():
     total_f1_score = 0
     i = 0
     for test in test_data:
-        print('test', i)
-        i += 1
-        words = test.leaves()
-        scores, backs = cky_parsing(words, copy(P_grammar), copy(P_non_terms), copy(P_vocab), copy(P_term_parents), copy(P_parents_count))
-        predicted_tree = build_tree(Tree(Nonterminal('S'), []), 0, len(words), backs, P_non_terms)
-        clean_tree(predicted_tree)
-        predicted_tree.un_chomsky_normal_form()
-        precision, recall, f1_score = evaluate(words, predicted_tree, test)
-        print(precision, recall, f1_score)
-        total_precision += precision
-        toal_recall += recall
-        total_f1_score += f1_score
+        i+=1
+        try:
+            words = test.leaves()
+            scores, backs = cky_parsing(words, copy(P_grammar), copy(P_non_terms), copy(P_vocab), copy(P_term_parents), copy(P_parents_count))
+            start = Tree(Nonterminal('S'), [])
+            if scores[0][len(words)][Nonterminal('S')] == 0:
+                start = get_start(scores, len(words))
+            predicted_tree = build_tree(start, 0, len(words), backs, P_non_terms)
+            clean_tree(predicted_tree)
+            predicted_tree.un_chomsky_normal_form()
+            precision, recall, f1_score = evaluate(words, predicted_tree, test)
+            print(precision, recall, f1_score)
+            total_precision += precision
+            toal_recall += recall
+            total_f1_score += f1_score
+        except:
+            print('***************Failed', i-1)
+            continue
 
     total_precision /= len(test_data)
     toal_recall /= len(test_data)
