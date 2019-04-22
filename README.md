@@ -8,5 +8,4 @@ python cky.py "My laptop is heating too much."
 python cky.py -train
 
 ## Packages requirement
-nltk
-tqdm
+nltk and tqdm
