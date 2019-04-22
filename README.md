@@ -8,4 +8,9 @@ python cky.py "My laptop is heating too much."
 python cky.py -train
 
 ## Packages requirement
-nltk and tqdm
+nltk <br />
+tqdm
+
+## Link to execute in gpuserv
+/home/e1-246-18/parse.sh <br />
+Usage: sh /home/e1-246-18/parse.sh "My laptop is heating too much.
