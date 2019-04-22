@@ -197,4 +197,4 @@ if __name__ == '__main__':
     if sys.argv[1] == '-train':
         train()
     else:
-        parse(' '.join(sys.argv[1:]))
+        parse(sys.argv[1])
