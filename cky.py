@@ -147,6 +147,7 @@ def train():
     total_f1_score = 0
     i = 0
     for test in test_data:
+        print('Test', i)
         i+=1
         try:
             words = test.leaves()
