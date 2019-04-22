@@ -5,6 +5,8 @@ from tqdm import tqdm
 from nltk.grammar import Production, Nonterminal
 from copy import copy
 import nltk
+from nltk import casual_tokenize
+import sys
 
 SMOOTHING_PARAMETER = 0.5
 
@@ -129,7 +131,7 @@ def get_start(score, l):
             root = each
     return Tree(root, [])
 
-def main():
+def train():
     files = tb.fileids()
     data = list(tb.parsed_sents(files))
 
@@ -172,4 +174,26 @@ def main():
     print('Recall', toal_recall)
     print('F1_score', total_f1_score)
 
-main()
+def parse(sent):
+    files = tb.fileids()
+    data = list(tb.parsed_sents(files))
+
+    P_grammar, P_non_terms, P_vocab, P_term_parents, P_parents_count = pcfg.pcfg(data)
+
+    words = casual_tokenize(str(sent))
+    scores, backs = cky_parsing(words, copy(P_grammar), copy(P_non_terms), copy(P_vocab), copy(P_term_parents), copy(P_parents_count))
+    start = Tree(Nonterminal('S'), [])
+    if scores[0][len(words)][Nonterminal('S')] == 0:
+        start = get_start(scores, len(words))
+    predicted_tree = build_tree(start, 0, len(words), backs, P_non_terms)
+    clean_tree(predicted_tree)
+    predicted_tree.un_chomsky_normal_form()
+    print('Parsed Tree')
+    print(predicted_tree)
+
+
+if __name__ == '__main__':
+    if sys.argv[1] == '-train':
+        train()
+    else:
+        parse(' '.join(sys.argv[1:]))
